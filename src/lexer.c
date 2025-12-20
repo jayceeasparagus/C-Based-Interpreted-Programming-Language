@@ -92,12 +92,12 @@ void print_token(Token t) {
         printf(" name=%s", t.lexeme);
     }
     if (t.type == TOKEN_NUMBER) {
-        printf(" value=%d", t.value);
+        printf(" value=%.2f", t.value);
     }
     printf("\n");
 }
 
-Token make_token(TokenType type, const char *lexeme, int value, int line) {
+Token make_token(TokenType type, const char *lexeme, double value, int line) {
     Token token;
     token.type = type;
     token.lexeme = lexeme;
@@ -125,6 +125,7 @@ void skip_whitespace(Lexer *lexer) {
 Token make_token_number(Lexer *lexer) {
     int value = 0;
 
+    // binary
     if (lexer->src[lexer->pos] == '0' && lexer->src[lexer->pos + 1] == 'b') {
         lexer->pos += 2;
         
@@ -133,6 +134,7 @@ Token make_token_number(Lexer *lexer) {
             lexer->pos++;
         }
     }
+    // decimal
     else {
         while (isdigit(lexer->src[lexer->pos])) {
             value = value * 10 + (lexer->src[lexer->pos] - '0');

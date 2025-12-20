@@ -27,32 +27,32 @@ typedef enum {
     TOKEN_NUMBER,
 
     // Operators
-    TOKEN_ADD, // X
-    TOKEN_SUBTRACT, // X
-    TOKEN_MULTIPLY, // X
-    TOKEN_DIVIDE, // X
-    TOKEN_LOGICAND, // X
-    TOKEN_LOGICOR, // X
+    TOKEN_ADD,
+    TOKEN_SUBTRACT,
+    TOKEN_MULTIPLY,
+    TOKEN_DIVIDE,
+    TOKEN_LOGICAND,
+    TOKEN_LOGICOR,
     TOKEN_BITAND,
     TOKEN_BITOR,
-    TOKEN_XOR, // X
-    TOKEN_NOT, // X
-    TOKEN_EQUAL, // X
-    TOKEN_EQUALITY, // X
-    TOKEN_NE, // X
-    TOKEN_LT, // X
-    TOKEN_GT, // X
-    TOKEN_LTE, // X
-    TOKEN_GTE, // X
+    TOKEN_XOR,
+    TOKEN_NOT,
+    TOKEN_EQUAL,
+    TOKEN_EQUALITY,
+    TOKEN_NE,
+    TOKEN_LT,
+    TOKEN_GT,
+    TOKEN_LTE,
+    TOKEN_GTE,
 
     // Delimiters and symbols
-    TOKEN_LPAREN, // X
-    TOKEN_RPAREN, // X
-    TOKEN_LBRACE, // X
-    TOKEN_RBRACE, // X
-    TOKEN_COMMA, // X
-    TOKEN_SEMICOLON, // X
-    TOKEN_EOF, // X
+    TOKEN_LPAREN,
+    TOKEN_RPAREN,
+    TOKEN_LBRACE,
+    TOKEN_RBRACE,
+    TOKEN_COMMA,
+    TOKEN_SEMICOLON,
+    TOKEN_EOF,
 
     // Unknown
     TOKEN_UNKNOWN
@@ -61,7 +61,7 @@ typedef enum {
 typedef struct {
     TokenType type;
     const char *lexeme;
-    int value;
+    double value;
     int line;
 } Token;
 
@@ -76,7 +76,7 @@ typedef struct {
     int line;
 } Lexer;
 
-Token make_token(TokenType type, const char *lexeme, int value, int line);
+Token make_token(TokenType type, const char *lexeme, double value, int line);
 
 void skip_whitespace(Lexer *lexer);
 
