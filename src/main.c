@@ -1,19 +1,21 @@
 #include <stdio.h>
+#include "lexer.h"
+#include "parser.h"
 #include "ast.h"
 
 int main() {
-    // Build AST for: 1 + 2 * 3
+    const char *source =
+        "print(1 + 2 * 3);\n"
+        "print((1 + 2) * 3);\n";
 
-    ASTNode *one   = ast_number(1);
-    ASTNode *two   = ast_number(2);
-    ASTNode *three = ast_number(3);
+    Lexer lexer = { source, 0, 1 };
+    Parser parser;
+    parser_init(&parser, &lexer);
 
-    ASTNode *mul = ast_binary(TOKEN_MULTIPLY, two, three);
-    ASTNode *add = ast_binary(TOKEN_ADD, one, mul);
+    ASTNode *program = parse_program(&parser);
 
-    ASTNode *print = ast_print(add);
-
-    ast_print_tree(print, 0);
+    ast_print_tree(program, 0);
 
     return 0;
 }
+
