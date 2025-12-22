@@ -1,12 +1,13 @@
-#include <stdio.h>
 #include "lexer.h"
 #include "parser.h"
 #include "ast.h"
+#include "eval.h"
 
 int main() {
     const char *source =
         "print(1 + 2 * 3);\n"
-        "print((1 + 2) * 3);\n";
+        "print((1 + 2) * 3);\n"
+        "print(4 & 3 | 1);\n";
 
     Lexer lexer = { source, 0, 1 };
     Parser parser;
@@ -14,7 +15,7 @@ int main() {
 
     ASTNode *program = parse_program(&parser);
 
-    ast_print_tree(program, 0);
+    eval(program);
 
     return 0;
 }
