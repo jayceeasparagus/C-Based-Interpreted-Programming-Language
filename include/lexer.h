@@ -23,8 +23,11 @@ typedef enum {
     // Identifier
     TOKEN_IDENTIFIER,
 
-    // Numerical Literal
+    // Literals
     TOKEN_NUMBER,
+    TOKEN_BOOLEAN,
+    TOKEN_TRUE,
+    TOKEN_FALSE,
 
     // Operators
     TOKEN_ADD,
@@ -37,7 +40,7 @@ typedef enum {
     TOKEN_BITOR,
     TOKEN_XOR,
     TOKEN_NOT,
-    TOKEN_EQUAL,
+    TOKEN_ASSIGN,
     TOKEN_EQUALITY,
     TOKEN_NE,
     TOKEN_LT,

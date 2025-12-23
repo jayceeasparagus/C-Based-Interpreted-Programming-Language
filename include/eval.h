@@ -2,7 +2,8 @@
 #define EVAL_H
 
 #include "ast.h"
+#include "env.h"
 
-double eval(ASTNode *node);
+Value eval(ASTNode *node);
 
 #endif

@@ -29,6 +29,10 @@ const char *token_type_name(TokenType type) {
             return "IDENTIFIER";
         case TOKEN_NUMBER:
             return "NUMBER";
+        case TOKEN_TRUE:
+            return "TRUE";
+        case TOKEN_FALSE:
+            return "FALSE";
 
         case TOKEN_ADD:
             return "ADD";
@@ -51,8 +55,8 @@ const char *token_type_name(TokenType type) {
         case TOKEN_NOT:
             return "NOT";
 
-        case TOKEN_EQUAL:
-            return "EQUAL";
+        case TOKEN_ASSIGN:
+            return "ASSIGN";
         case TOKEN_EQUALITY:
             return "EQUALITY";
         case TOKEN_NE:
@@ -202,6 +206,14 @@ Token make_token_identifier_keyword(Lexer *lexer) {
         Token token = make_token(TOKEN_PRINT, text, 0, lexer->line);
         return token;
     }
+    else if (strcmp(text, "true") == 0) {
+        Token token = make_token(TOKEN_TRUE, text, 1, lexer->line);
+        return token;
+    }
+    else if (strcmp(text, "false") == 0) {
+        Token token = make_token(TOKEN_FALSE, text, 0, lexer->line);
+        return token;
+    }
     Token token = make_token(TOKEN_IDENTIFIER, text, 0, lexer->line);
     return token;
 }
@@ -234,7 +246,7 @@ Token next_token(Lexer *lexer) {
                 return make_token(TOKEN_EQUALITY, NULL, 0, lexer->line);
             }
             lexer->pos++;
-            return make_token(TOKEN_EQUAL, NULL, 0, lexer->line);
+            return make_token(TOKEN_ASSIGN, NULL, 0, lexer->line);
         case '!':
             if (lexer->src[lexer->pos + 1] == '=') {
                 lexer->pos += 2;

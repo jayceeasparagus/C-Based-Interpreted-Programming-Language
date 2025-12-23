@@ -7,6 +7,13 @@ ASTNode *ast_number(double value) {
     return astnode;
 }
 
+ASTNode *ast_boolean(double boolean) {
+    ASTNode *astnode = malloc(sizeof(ASTNode));
+    astnode->type = AST_BOOLEAN;
+    astnode->number = boolean;
+    return astnode;
+}
+
 ASTNode *ast_identifier(const char *name) {
     ASTNode *astnode = malloc(sizeof(ASTNode));
     astnode->type = AST_IDENTIFIER;
@@ -46,6 +53,23 @@ ASTNode *ast_statements(ASTNode **statements, int count) {
     return astnode;
 }
 
+ASTNode *ast_assign(const char *name, ASTNode *value) {
+    ASTNode *astnode = malloc(sizeof(ASTNode));
+    astnode->type = AST_ASSIGN;
+    astnode->assign.name = name;
+    astnode->assign.value = value;
+    return astnode;
+}
+
+ASTNode *ast_declaration(const char *name, TokenType type, ASTNode *value) {
+    ASTNode *astnode = malloc(sizeof(ASTNode));
+    astnode->type = AST_DECLARATION;
+    astnode->declaration.name = name;
+    astnode->declaration.type = type;
+    astnode->declaration.value = value;
+    return astnode;
+}
+
 void ast_print_tree(ASTNode *node, int indent) {
     if (!node) {
         return;
@@ -57,6 +81,9 @@ void ast_print_tree(ASTNode *node, int indent) {
 
     switch (node->type) {
         case AST_NUMBER:
+            printf("%.2f\n", node->number);
+            break;
+        case AST_BOOLEAN:
             printf("%.2f\n", node->number);
             break;
         case AST_IDENTIFIER:
@@ -80,6 +107,14 @@ void ast_print_tree(ASTNode *node, int indent) {
             for (int i = 0; i < node->statements.count; ++i) {
                 ast_print_tree(node->statements.statements[i], indent + 1);
             }
+            break;
+        case AST_ASSIGN:
+            printf("ASSIGN\n");
+            ast_print_tree(node->assign.value, indent + 1);
+            break;
+        case AST_DECLARATION:
+            printf("DECLARATION\n");
+            ast_print_tree(node->declaration.value, indent + 1);
             break;
     }
 }

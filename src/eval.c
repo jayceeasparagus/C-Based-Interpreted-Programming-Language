@@ -1,35 +1,45 @@
 #include "eval.h"
 #include <stdint.h>
 
-double eval(ASTNode *node) {
+Value eval(ASTNode *node) {
     if(!node) {
-        return 0;
+        return value_number(0);
     }
 
     switch (node->type) {
         case AST_NUMBER:
-            return node->number;
+            return value_number(node->number);
 
+        case AST_IDENTIFIER:
+            return env_get(node->identifier);
+
+        case AST_BOOLEAN:
+            return value_boolean(node->number);
+      
         case AST_BINARY: {
-            double left = eval(node->binary.left);
-            double right = eval(node->binary.right);
+            Value left = eval(node->binary.left);
+            Value right = eval(node->binary.right);
 
             switch (node->binary.operand) {
                 case TOKEN_ADD:
-                    return left + right;
+                    return value_number(left.number + right.number);
                 case TOKEN_SUBTRACT:
-                    return left - right;
+                    return value_number(left.number - right.number);
                 case TOKEN_MULTIPLY:
-                    return left * right;
+                    return value_number(left.number * right.number);
                 case TOKEN_DIVIDE:
-                    return left / right;
+                    return value_number(left.number / right.number);
                 
                 case TOKEN_BITAND:
-                    return (double)((uint64_t)left & (uint64_t)right);
+                    return value_number((double)((uint64_t)left.number & (uint64_t)right.number));
                 case TOKEN_BITOR:
-                    return (double)((uint64_t)left | (uint64_t)right);
+                    return value_number((double)((uint64_t)left.number | (uint64_t)right.number));
                 case TOKEN_XOR:
-                    return (double)((uint64_t)left ^ (uint64_t)right);
+                    return value_number((double)((uint64_t)left.number ^ (uint64_t)right.number));
+                case TOKEN_LOGICAND:
+                    return value_boolean(left.boolean && right.boolean);
+                case TOKEN_LOGICOR:
+                    return value_boolean(left.boolean || right.boolean);
 
                 default:
                     printf("ERROR: Unknown binary operator");
@@ -38,13 +48,13 @@ double eval(ASTNode *node) {
         }
 
             case AST_UNARY: {
-                double value = eval(node->unary.expression);
+                Value value = eval(node->unary.expression);
 
                 switch (node->unary.operand) {
-                    case TOKEN_NOT:
-                        return !value;
                     case TOKEN_SUBTRACT:
-                        return -value;
+                        return value_number(-value.number);
+                    case TOKEN_NOT:
+                        return value_boolean(!eval(node->unary.expression).boolean);
                     default:
                         printf("ERROR: Unknown unary operator\n");
                         exit(1);
@@ -52,19 +62,41 @@ double eval(ASTNode *node) {
             }
 
             case AST_PRINT: {
-                double value = eval(node->print.expression);
-                printf("%g\n", value);
+                Value value = eval(node->print.expression);
+                if (value.type == VAL_NUMBER) {
+                    printf("%g\n", value.number);
+                }
+                else if (value.type == VAL_BOOL) {
+                    if (value.boolean == 1) {
+                        printf("true\n");
+                    }
+                    else {
+                        printf("false\n");
+                    }
+                }
                 return value;
             }
 
             case AST_STATEMENTS: {
-                double last = 0;
+                Value last = value_number(0);
 
                 for (int i = 0; i < node->statements.count; ++i) {
                     last = eval(node->statements.statements[i]);
                 }
 
                 return last;
+            }
+
+            case AST_DECLARATION: {
+                Value value = eval(node->declaration.value);
+                env_set(node->declaration.name, value);
+                return value;
+            }
+
+            case AST_ASSIGN: {
+                Value value = eval(node->assign.value);
+                env_set(node->assign.name, value);
+                return value;
             }
 
             default: {
