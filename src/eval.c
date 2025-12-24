@@ -122,6 +122,19 @@ Value eval(ASTNode *node) {
                 }
             }
 
+            case AST_IF_ELSE: {
+                Value condition = eval(node->if_else.condition);
+
+                if (condition.boolean) {
+                    return eval(node->if_else.then_statements);
+                }
+                else if (node->if_else.else_statements) {
+                    return eval(node->if_else.else_statements);
+                }
+
+                return value_number(0);
+            }
+
             default: {
                 printf("ERROR: Unknown ASTNode type\n");
                 exit(1);

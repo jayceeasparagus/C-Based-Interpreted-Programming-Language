@@ -5,14 +5,15 @@
 
 int main() {
     const char *source =
-    "num a = 5;\n"
-    "a = a + 2;\n"
-    "print(a);\n"
-    "bool b = true;\n"
-    "bool c = false;\n"
-    "print(!b || c);\n"
-    "print(b != c);\n"
-    "print((a + 2) <= (a * 4));\n";
+    "if (5 < 3) {\n"
+    "print(1);\n"
+    "}\n"
+    "elif (6 == 2) {\n"
+    "print(2);\n"
+    "}\n"
+    "else {\n"
+    "print(3);\n"
+    "}\n";
 
     Lexer lexer = { source, 0, 1 };
 

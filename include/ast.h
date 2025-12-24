@@ -13,7 +13,8 @@ typedef enum {
     AST_ASSIGN,
     AST_DECLARATION,
     AST_BOOLEAN,
-    AST_COMPARISON
+    AST_COMPARISON,
+    AST_IF_ELSE
 } ASTType;
 
 typedef struct ASTNode {
@@ -58,6 +59,12 @@ typedef struct ASTNode {
             struct ASTNode *left;
             struct ASTNode *right;
         } comparison;
+
+        struct {
+            struct ASTNode *condition;
+            struct ASTNode *then_statements;
+            struct ASTNode *else_statements;
+        } if_else;
     };
 } ASTNode;
 
@@ -80,6 +87,8 @@ ASTNode *ast_assign(const char *name, ASTNode *value);
 ASTNode *ast_declaration(const char *name, TokenType type, ASTNode *value);
 
 ASTNode *ast_comparison(TokenType operand, ASTNode *left, ASTNode *right);
+
+ASTNode *ast_if_else(ASTNode *condition, ASTNode *then_statements, ASTNode *else_statements);
 
 void ast_print_tree(ASTNode *node, int indent);
 

@@ -29,6 +29,55 @@ ASTNode *parse_program(Parser *parser) {
     return ast_statements(statements, count);
 }
 
+ASTNode *parse_statements(Parser *parser) {
+    expect(parser, TOKEN_LBRACE);
+
+    ASTNode **statements = NULL;
+    int count = 0;
+
+    while (parser->current.type != TOKEN_RBRACE) {
+        statements = realloc(statements, sizeof(*statements) * (count + 1));
+        statements[count++] = parse_statement(parser);
+    }
+
+    expect(parser, TOKEN_RBRACE);
+    return ast_statements(statements, count);
+}
+
+ASTNode *parse_if_else(Parser *parser) {
+    expect(parser, TOKEN_IF);
+    expect(parser, TOKEN_LPAREN);
+
+    ASTNode *condition = parse_comparison(parser);
+
+    expect(parser, TOKEN_RPAREN);
+
+    ASTNode *then_statements = parse_statements(parser);
+
+    ASTNode *root = ast_if_else(condition, then_statements, NULL);
+    ASTNode *current = root;
+
+    while (parser->current.type == TOKEN_ELIF) {
+        advance(parser);
+        expect(parser, TOKEN_LPAREN);
+
+        ASTNode *elif_condition = parse_comparison(parser);
+
+        expect(parser, TOKEN_RPAREN);
+        ASTNode *elif_statements = parse_statements(parser);
+
+        current->if_else.else_statements = ast_if_else(elif_condition, elif_statements, NULL);
+        current = current->if_else.else_statements;
+    }
+
+    if (parser->current.type == TOKEN_ELSE) {
+        advance(parser);
+        current->if_else.else_statements = parse_statements(parser);
+    }
+
+    return root;
+}
+
 ASTNode *parse_statement(Parser *parser) {
     switch (parser->current.type) {
         case TOKEN_PRINT:
@@ -39,6 +88,8 @@ ASTNode *parse_statement(Parser *parser) {
             return parse_declaration(parser);
         case TOKEN_IDENTIFIER:
             return parse_assignment(parser);
+        case TOKEN_IF:
+            return parse_if_else(parser);
         default:
             printf("ERROR: Incorrect statement token at: %d\n", parser->current.line);
             exit(1);

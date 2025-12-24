@@ -10,6 +10,10 @@ void parser_init(Parser *parser, Lexer *lexer);
 
 ASTNode *parse_program(Parser *parser);
 
+ASTNode *parse_block(Parser *parser);
+
+ASTNode *parse_if_else(Parser *parser);
+
 ASTNode *parse_statement(Parser *parser);
 
 ASTNode *parse_declaration(Parser *parser);

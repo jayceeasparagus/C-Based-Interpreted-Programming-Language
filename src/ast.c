@@ -79,6 +79,15 @@ ASTNode *ast_comparison(TokenType operand, ASTNode *left, ASTNode *right) {
     return node;
 }
 
+ASTNode *ast_if_else(ASTNode *condition, ASTNode *then_statements, ASTNode *else_statements) {
+    ASTNode *node = malloc(sizeof(ASTNode));
+    node->type = AST_IF_ELSE;
+    node->if_else.condition = condition;
+    node->if_else.then_statements = then_statements;
+    node->if_else.else_statements = else_statements;
+    return node;
+}
+
 void ast_print_tree(ASTNode *node, int indent) {
     if (!node) {
         return;
@@ -129,6 +138,28 @@ void ast_print_tree(ASTNode *node, int indent) {
             printf("%s\n", token_type_name(node->comparison.operand));
             ast_print_tree(node->comparison.left, indent + 1);
             ast_print_tree(node->comparison.right, indent + 1);
+            break;
+        case AST_IF_ELSE:
+            printf("IF\n");
+            for (int i = 0; i < indent + 1; ++i) {
+                printf(" ");
+            }
+            printf("CONDITION\n");
+            ast_print_tree(node->if_else.condition, indent + 2);
+
+            for (int i = 0; i < indent + 1; ++i) {
+                printf(" ");
+            }
+            printf("THEN\n");
+            ast_print_tree(node->if_else.then_statements, indent + 2);
+            
+            if (node->if_else.else_statements) {
+                for (int i = 0; i < indent + 1; ++i) {
+                    printf(" ");
+                }
+                printf("ELSE\n");
+                ast_print_tree(node->if_else.else_statements, indent + 2);
+            }
             break;
     }
 }
