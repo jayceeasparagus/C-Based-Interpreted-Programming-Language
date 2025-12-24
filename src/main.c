@@ -10,7 +10,9 @@ int main() {
     "print(a);\n"
     "bool b = true;\n"
     "bool c = false;\n"
-    "print(!b || c);\n";
+    "print(!b || c);\n"
+    "print(b != c);\n"
+    "print((a + 2) <= (a * 4));\n";
 
     Lexer lexer = { source, 0, 1 };
 
@@ -19,11 +21,9 @@ int main() {
 
     ASTNode *program = parse_program(&parser);
 
-    //ast_print_tree(program, 0);
+    ast_print_tree(program, 0);
 
     eval(program);
 
     return 0;
 }
-
-// ADD UNARY

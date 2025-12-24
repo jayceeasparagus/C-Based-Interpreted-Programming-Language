@@ -70,6 +70,15 @@ ASTNode *ast_declaration(const char *name, TokenType type, ASTNode *value) {
     return astnode;
 }
 
+ASTNode *ast_comparison(TokenType operand, ASTNode *left, ASTNode *right) {
+    ASTNode *node = malloc(sizeof(ASTNode));
+    node->type = AST_COMPARISON;
+    node->comparison.operand = operand;
+    node->comparison.left = left;
+    node->comparison.right = right;
+    return node;
+}
+
 void ast_print_tree(ASTNode *node, int indent) {
     if (!node) {
         return;
@@ -115,6 +124,11 @@ void ast_print_tree(ASTNode *node, int indent) {
         case AST_DECLARATION:
             printf("DECLARATION\n");
             ast_print_tree(node->declaration.value, indent + 1);
+            break;
+        case AST_COMPARISON:
+            printf("%s\n", token_type_name(node->comparison.operand));
+            ast_print_tree(node->comparison.left, indent + 1);
+            ast_print_tree(node->comparison.right, indent + 1);
             break;
     }
 }

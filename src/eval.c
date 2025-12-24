@@ -99,6 +99,29 @@ Value eval(ASTNode *node) {
                 return value;
             }
 
+            case AST_COMPARISON: {
+                Value left = eval(node->comparison.left);
+                Value right = eval(node->comparison.right);
+
+                switch (node->comparison.operand) {
+                    case TOKEN_EQUALITY:
+                        return value_boolean(left.number == right.number);
+                    case TOKEN_NE:
+                        return value_boolean(left.number != right.number);
+                    case TOKEN_LT:
+                        return value_boolean(left.number < right.number);
+                    case TOKEN_GT:
+                        return value_boolean(left.number > right.number);
+                    case TOKEN_LTE:
+                        return value_boolean(left.number <= right.number);
+                    case TOKEN_GTE:
+                        return value_boolean(left.number >= right.number);
+                    default:
+                        printf("ERROR: Unknown comparison operator\n");
+                        exit(1);
+                }
+            }
+
             default: {
                 printf("ERROR: Unknown ASTNode type\n");
                 exit(1);

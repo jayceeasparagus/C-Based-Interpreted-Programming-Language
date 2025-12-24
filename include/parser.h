@@ -18,6 +18,10 @@ ASTNode *parse_assignment(Parser *parser);
 
 ASTNode *parse_print(Parser *parser);
 
+int comparison_operator(TokenType type);
+
+ASTNode *parse_comparison(Parser *parser);
+
 int expression_operator(TokenType type);
 
 ASTNode *parse_expression(Parser *parser);

@@ -53,7 +53,7 @@ ASTNode *parse_declaration(Parser *parser) {
     expect(parser, TOKEN_IDENTIFIER);
 
     expect(parser, TOKEN_ASSIGN);
-    ASTNode *value = parse_expression(parser);
+    ASTNode *value = parse_comparison(parser);
 
     expect(parser, TOKEN_SEMICOLON);
     return ast_declaration(name, type, value);
@@ -64,7 +64,7 @@ ASTNode *parse_assignment(Parser *parser) {
     expect(parser, TOKEN_IDENTIFIER);
 
     expect(parser, TOKEN_ASSIGN);
-    ASTNode *value = parse_expression(parser);
+    ASTNode *value = parse_comparison(parser);
 
     expect(parser, TOKEN_SEMICOLON);
     return ast_assign(name, value);
@@ -74,12 +74,31 @@ ASTNode *parse_print(Parser *parser) {
     expect(parser, TOKEN_PRINT);
     expect(parser, TOKEN_LPAREN);
 
-    ASTNode *expression = parse_expression(parser);
+    ASTNode *expression = parse_comparison(parser);
 
     expect(parser, TOKEN_RPAREN);
     expect(parser, TOKEN_SEMICOLON);
 
     return ast_print(expression);
+}
+
+int comparison_operator(TokenType type) {
+    return (type == TOKEN_EQUALITY || type == TOKEN_NE ||
+    type == TOKEN_LT || type == TOKEN_GT || 
+    type == TOKEN_LTE || type == TOKEN_GTE);
+}
+
+ASTNode *parse_comparison(Parser *parser) {
+    ASTNode *left = parse_expression(parser);
+
+    if (comparison_operator(parser->current.type)) {
+        TokenType operand = parser->current.type;
+        advance(parser);
+        ASTNode *right = parse_expression(parser);
+        return ast_comparison(operand, left, right);
+    }
+
+    return left;
 }
 
 int expression_operator(TokenType type) {
@@ -139,7 +158,7 @@ ASTNode *parse_factor(Parser *parser) {
     }
     if (parser->current.type == TOKEN_LPAREN) {
         advance(parser);
-        ASTNode *expression = parse_expression(parser);
+        ASTNode *expression = parse_comparison(parser);
         expect(parser, TOKEN_RPAREN);
         return expression;
     }
