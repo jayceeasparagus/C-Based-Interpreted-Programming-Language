@@ -135,6 +135,16 @@ Value eval(ASTNode *node) {
                 return value_number(0);
             }
 
+            case AST_WHILE: {
+                Value result = value_number(0);
+
+                while (eval(node->while_loop.condition).boolean) {
+                    result = eval(node->while_loop.body);
+                }
+
+                return result;
+            }
+
             default: {
                 printf("ERROR: Unknown ASTNode type\n");
                 exit(1);

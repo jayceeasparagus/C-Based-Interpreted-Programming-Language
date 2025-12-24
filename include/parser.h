@@ -14,6 +14,8 @@ ASTNode *parse_block(Parser *parser);
 
 ASTNode *parse_if_else(Parser *parser);
 
+ASTNode *parse_while_loop(Parser *parser);
+
 ASTNode *parse_statement(Parser *parser);
 
 ASTNode *parse_declaration(Parser *parser);

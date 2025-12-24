@@ -78,6 +78,18 @@ ASTNode *parse_if_else(Parser *parser) {
     return root;
 }
 
+ASTNode *parse_while_loop(Parser *parser) {
+    expect(parser, TOKEN_WHILE);
+    expect(parser, TOKEN_LPAREN);
+
+    ASTNode *condition = parse_comparison(parser);
+
+    expect(parser, TOKEN_RPAREN);
+    ASTNode *body = parse_statements(parser);
+
+    return ast_while_loop(condition, body);
+}
+
 ASTNode *parse_statement(Parser *parser) {
     switch (parser->current.type) {
         case TOKEN_PRINT:
@@ -90,6 +102,8 @@ ASTNode *parse_statement(Parser *parser) {
             return parse_assignment(parser);
         case TOKEN_IF:
             return parse_if_else(parser);
+        case TOKEN_WHILE:
+            return parse_while_loop(parser);
         default:
             printf("ERROR: Incorrect statement token at: %d\n", parser->current.line);
             exit(1);

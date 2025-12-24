@@ -88,6 +88,14 @@ ASTNode *ast_if_else(ASTNode *condition, ASTNode *then_statements, ASTNode *else
     return node;
 }
 
+ASTNode *ast_while_loop(ASTNode *condition, ASTNode *body) {
+    ASTNode *node = malloc(sizeof(ASTNode));
+    node->type = AST_WHILE;
+    node->while_loop.condition = condition;
+    node->while_loop.body = body;
+    return node;
+}
+
 void ast_print_tree(ASTNode *node, int indent) {
     if (!node) {
         return;
@@ -148,18 +156,33 @@ void ast_print_tree(ASTNode *node, int indent) {
             ast_print_tree(node->if_else.condition, indent + 2);
 
             for (int i = 0; i < indent + 1; ++i) {
-                printf(" ");
+                printf("  ");
             }
             printf("THEN\n");
             ast_print_tree(node->if_else.then_statements, indent + 2);
             
             if (node->if_else.else_statements) {
                 for (int i = 0; i < indent + 1; ++i) {
-                    printf(" ");
+                    printf("  ");
                 }
                 printf("ELSE\n");
                 ast_print_tree(node->if_else.else_statements, indent + 2);
             }
+            break;
+        case AST_WHILE:
+            printf("WHILE\n");
+
+            for (int i = 0; i < indent + 1; ++i) {
+                printf("  ");
+            }
+            printf("CONDITION\n");
+            ast_print_tree(node->while_loop.condition, indent + 2);
+
+            for (int i = 0; i < indent + 1; ++i) {
+                printf("  ");
+            }
+            printf("BODY\n");
+            ast_print_tree(node->while_loop.body, indent + 2);
             break;
     }
 }
