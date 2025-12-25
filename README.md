@@ -5,4 +5,4 @@ The language features variables, printing, control flow, loops, and modules.
 
 The program uses a lexer to make tokens, parser that uses ast for structure, eval to run the parsed program, and env for stack-based scoping variables.
 
-To run the compiler, get the executable and run: "./jh <filepathofyourprogram>"
+To run the compiler, get the executable and run: "./jh 'file_path'"
