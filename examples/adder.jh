@@ -1,0 +1,10 @@
+module add(input a, input b, output c) {\n"
+    c = a + b;
+}
+num x = 2;
+num y = 3;
+num z = 0;
+add(x, y, z);
+print(z);
+bool h = true;
+print(!h || true);

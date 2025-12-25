@@ -1,5 +1,21 @@
 #include "eval.h"
+#include "env.h"
 #include <stdint.h>
+
+#define MAX_MODULES 128
+
+static ModuleEntry modules[MAX_MODULES];
+static int module_count = 0;
+
+ASTNode *find_module(const char *name) {
+    for (int i = 0; i < module_count; ++i) {
+        if (strcmp(modules[i].name, name) == 0) {
+            return modules[i].module;
+        }
+    }
+    printf("ERROR: Unknown module '%s'", name);
+    exit(1);
+}
 
 Value eval(ASTNode *node) {
     if(!node) {
@@ -54,7 +70,7 @@ Value eval(ASTNode *node) {
                     case TOKEN_SUBTRACT:
                         return value_number(-value.number);
                     case TOKEN_NOT:
-                        return value_boolean(!eval(node->unary.expression).boolean);
+                        return value_boolean(!value.boolean);
                     default:
                         printf("ERROR: Unknown unary operator\n");
                         exit(1);
@@ -87,9 +103,12 @@ Value eval(ASTNode *node) {
                 return last;
             }
 
+
             case AST_DECLARATION: {
                 Value value = eval(node->declaration.value);
+
                 env_set(node->declaration.name, value);
+
                 return value;
             }
 
@@ -143,6 +162,37 @@ Value eval(ASTNode *node) {
                 }
 
                 return result;
+            }
+
+            case AST_MODULE: 
+                modules[module_count++] = (ModuleEntry){node->module.name, node};
+                return value_number(0);
+
+            case AST_CALL: {
+                ASTNode *module = find_module(node->call.name);
+
+                Env *module_env = push_env();
+
+                for (int i = 0; i < module->module.input_count; i++) {
+                    Value v = eval(node->call.args[i]);
+                    env_set(module->module.inputs[i], v);
+                }
+
+                eval(module->module.body);
+
+                Value outputs[16];
+                for (int i = 0; i < module->module.output_count; i++) {
+                    outputs[i] = env_get_from(module_env, module->module.outputs[i]);
+                }
+
+                pop_env();
+                
+                for (int i = 0; i < module->module.output_count; i++) {
+                    ASTNode *out_arg = node->call.args[module->module.input_count + i];
+                    env_set(out_arg->identifier, outputs[i]);
+                }
+
+                return value_number(0);
             }
 
             default: {

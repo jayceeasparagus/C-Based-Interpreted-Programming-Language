@@ -15,7 +15,9 @@ typedef enum {
     AST_BOOLEAN,
     AST_COMPARISON,
     AST_IF_ELSE, 
-    AST_WHILE
+    AST_WHILE,
+    AST_MODULE,
+    AST_CALL
 } ASTType;
 
 typedef struct ASTNode {
@@ -71,6 +73,21 @@ typedef struct ASTNode {
             struct ASTNode *condition;
             struct ASTNode *body;
         } while_loop;
+
+        struct {
+            const char *name;
+            char **inputs;
+            int input_count;
+            char **outputs;
+            int output_count;
+            struct ASTNode *body;
+        } module;
+
+        struct {
+            const char *name;
+            struct ASTNode **args;
+            int arg_count;
+        } call;
     };
 } ASTNode;
 
@@ -97,6 +114,10 @@ ASTNode *ast_comparison(TokenType operand, ASTNode *left, ASTNode *right);
 ASTNode *ast_if_else(ASTNode *condition, ASTNode *then_statements, ASTNode *else_statements);
 
 ASTNode *ast_while_loop(ASTNode *condition, ASTNode *body);
+
+ASTNode *ast_module(const char *name, char **inputs, int input_count, char **outputs, int output_count, ASTNode *body);
+
+ASTNode *ast_call(const char *name, ASTNode **args, int arg_count);
 
 void ast_print_tree(ASTNode *node, int indent);
 

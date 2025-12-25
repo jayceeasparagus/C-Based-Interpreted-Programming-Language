@@ -1,5 +1,11 @@
 #include "ast.h"
 
+static void print_indent(int indent) {
+    for (int i = 0; i < indent; ++i) {
+        printf("  ");
+    }
+}
+
 ASTNode *ast_number(double value) {
     ASTNode *astnode = malloc(sizeof(ASTNode));
     astnode->type = AST_NUMBER;
@@ -85,6 +91,27 @@ ASTNode *ast_if_else(ASTNode *condition, ASTNode *then_statements, ASTNode *else
     node->if_else.condition = condition;
     node->if_else.then_statements = then_statements;
     node->if_else.else_statements = else_statements;
+    return node;
+}
+
+ASTNode *ast_module(const char *name, char **inputs, int input_count, char **outputs, int output_count, ASTNode *body) {
+    ASTNode *node = malloc(sizeof(ASTNode));
+    node->type = AST_MODULE;
+    node->module.name = name;
+    node->module.inputs = inputs;
+    node->module.input_count = input_count;
+    node->module.outputs = outputs;
+    node->module.output_count = output_count;
+    node->module.body = body;
+    return node;
+}
+
+ASTNode *ast_call(const char *name, ASTNode **args, int arg_count) {
+    ASTNode *node = malloc(sizeof(ASTNode));
+    node->type = AST_CALL;
+    node->call.name = name;
+    node->call.args = args;
+    node->call.arg_count = arg_count;
     return node;
 }
 
@@ -183,6 +210,38 @@ void ast_print_tree(ASTNode *node, int indent) {
             }
             printf("BODY\n");
             ast_print_tree(node->while_loop.body, indent + 2);
+            break;
+        case AST_MODULE:
+            print_indent(indent);
+            printf("MODULE %s\n", node->module.name);
+
+            print_indent(indent + 1);
+            printf("INPUTS\n");
+            for (int i = 0; i < node->module.input_count; ++i) {
+                print_indent(indent + 2);
+                printf("%s\n", node->module.inputs[i]);
+            }
+
+            print_indent(indent + 1);
+            printf("OUTPUTS\n");
+            for (int i = 0; i < node->module.output_count; ++i) {
+                print_indent(indent + 2);
+                printf("%s\n", node->module.outputs[i]);
+            }
+
+            print_indent(indent + 1);
+            printf("BODY\n");
+            ast_print_tree(node->module.body, indent + 2);
+            break;
+        case AST_CALL:
+            print_indent(indent);
+            printf("CALL %s\n", node->call.name);
+            
+            print_indent(indent + 1);
+            printf("ARGUMENTS\n");
+            for (int i = 0; i < node->call.arg_count; ++i) {
+                ast_print_tree(node->call.args[i], indent + 2);
+            }
             break;
     }
 }

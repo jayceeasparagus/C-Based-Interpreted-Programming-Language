@@ -2,16 +2,20 @@
 #include "parser.h"
 #include "ast.h"
 #include "eval.h"
+#include "env.h"
 
 int main() {
     const char *source =
-    "num i = 0;\n"
-
-    "while (i < 3) {\n"
-    "print(i);\n"
-    "i = i + 1;\n"
-    "}\n";
-
+    "module add(input a, input b, output c) {\n"
+    "c = a + b;\n"
+    "}\n"
+    "num x = 2;\n"
+    "num y = 3;\n"
+    "num z = 0;\n"
+    "add(x, y, z);\n"
+    "print(z);\n"
+    "bool h = true;\n"
+    "print(!h || true);\n";
 
     Lexer lexer = { source, 0, 1 };
 
@@ -20,8 +24,7 @@ int main() {
 
     ASTNode *program = parse_program(&parser);
 
-    ast_print_tree(program, 0);
-
+    env_init();
     eval(program);
 
     return 0;

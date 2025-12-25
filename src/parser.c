@@ -1,12 +1,26 @@
 #include "parser.h"
+#include <stdlib.h>
+#include <string.h>
+
+static char *copy_string(const char *src) {
+    char *str = malloc(strlen(src) + 1);
+    strcpy(str, src);
+    return str;
+}
 
 void parser_init(Parser *parser, Lexer *lexer) {
     parser->lexer = lexer;
     parser->current = next_token(lexer);
+    parser->next = next_token(lexer);
 }
 
 static void advance(Parser *parser) {
-    parser->current = next_token(parser->lexer);
+    parser->current = parser->next;
+    parser->next = next_token(parser->lexer);
+}
+
+TokenType peek_token(Parser *parser) {
+    return parser->next.type;
 }
 
 static void expect(Parser *parser, TokenType type) {
@@ -90,6 +104,94 @@ ASTNode *parse_while_loop(Parser *parser) {
     return ast_while_loop(condition, body);
 }
 
+void parse_params(Parser *parser, char ***inputs, int *input_count, char ***outputs, int *output_count) {
+    *inputs = NULL;
+    *outputs = NULL;
+    *input_count = 0;
+    *output_count = 0;
+
+    if (parser->current.type == TOKEN_RPAREN) {
+        return;
+    }
+
+    while (1) {
+        if (parser->current.type == TOKEN_INPUT) {
+            advance(parser);
+            char *name = (char*)copy_string(parser->current.lexeme);
+            expect(parser, TOKEN_IDENTIFIER);
+
+            *inputs = realloc(*inputs, sizeof(char*) * (++*input_count));
+            (*inputs)[*input_count - 1] = name;
+        }
+        else if (parser->current.type == TOKEN_OUTPUT) {
+            advance(parser);
+            char *name = (char*)copy_string(parser->current.lexeme);
+            expect(parser, TOKEN_IDENTIFIER);
+
+            *outputs = realloc(*outputs, sizeof(char*) * (++*output_count));
+            (*outputs)[*output_count - 1] = name;
+        }
+        else {
+            printf("ERROR: Unknown parameter type\n");
+            exit(1);
+        }
+
+        if (parser->current.type != TOKEN_COMMA) {
+            break;
+        }
+        advance(parser);
+    }
+}
+
+ASTNode *parse_module(Parser *parser) {
+    expect(parser, TOKEN_MODULE);
+
+    const char *name = copy_string(parser->current.lexeme);
+    expect(parser, TOKEN_IDENTIFIER);
+
+    expect(parser, TOKEN_LPAREN);
+
+    char **inputs;
+    char **outputs;
+    int input_count;
+    int output_count;
+
+    parse_params(parser, &inputs, &input_count, &outputs, &output_count);
+
+    expect(parser, TOKEN_RPAREN);
+
+    ASTNode *body = parse_statements(parser);
+
+    return ast_module(name, inputs, input_count, outputs, output_count, body);
+}
+
+ASTNode *parse_call(Parser *parser) {
+    const char *name = copy_string(parser->current.lexeme);
+    expect(parser, TOKEN_IDENTIFIER);
+
+    expect(parser, TOKEN_LPAREN);
+
+    ASTNode **args = NULL;
+    int count = 0;
+
+    if (parser->current.type != TOKEN_RPAREN) {
+        while (1) {
+            args = realloc(args, sizeof(*args) * (count + 1));
+            args[count++] = parse_expression(parser);
+
+            if (parser->current.type != TOKEN_COMMA) {
+                break;
+            }
+            advance(parser);
+        }
+    }
+
+    expect(parser, TOKEN_RPAREN);
+    expect(parser, TOKEN_SEMICOLON);
+
+    return ast_call(name, args, count);
+}
+
 ASTNode *parse_statement(Parser *parser) {
     switch (parser->current.type) {
         case TOKEN_PRINT:
@@ -99,11 +201,16 @@ ASTNode *parse_statement(Parser *parser) {
         case TOKEN_BOOL:
             return parse_declaration(parser);
         case TOKEN_IDENTIFIER:
+            if (peek_token(parser) == TOKEN_LPAREN) {
+                return parse_call(parser);
+            }
             return parse_assignment(parser);
         case TOKEN_IF:
             return parse_if_else(parser);
         case TOKEN_WHILE:
             return parse_while_loop(parser);
+        case TOKEN_MODULE:
+            return parse_module(parser);
         default:
             printf("ERROR: Incorrect statement token at: %d\n", parser->current.line);
             exit(1);
@@ -114,7 +221,7 @@ ASTNode *parse_declaration(Parser *parser) {
     TokenType type = parser->current.type;
     advance(parser);
 
-    const char *name = parser->current.lexeme;
+    const char *name = copy_string(parser->current.lexeme);
     expect(parser, TOKEN_IDENTIFIER);
 
     expect(parser, TOKEN_ASSIGN);
@@ -125,7 +232,7 @@ ASTNode *parse_declaration(Parser *parser) {
 }
 
 ASTNode *parse_assignment(Parser *parser) {
-    const char *name = parser->current.lexeme;
+    const char *name = copy_string(parser->current.lexeme);
     expect(parser, TOKEN_IDENTIFIER);
 
     expect(parser, TOKEN_ASSIGN);
@@ -236,7 +343,7 @@ ASTNode *parse_factor(Parser *parser) {
         return ast_boolean(0);
     }
     if (parser->current.type == TOKEN_IDENTIFIER) {
-        const char *name = parser->current.lexeme;
+        const char *name = copy_string(parser->current.lexeme);
         advance(parser);
         return ast_identifier(name);
     }
