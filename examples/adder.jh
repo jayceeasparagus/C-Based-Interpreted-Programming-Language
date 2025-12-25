@@ -17,3 +17,11 @@ while (temp < max) {
     print(temp);
     temp = temp + 1;
 }
+
+bool flag = false;
+if (flag) {
+    print(0);
+}
+elif (!flag) {
+    print(1);
+}
