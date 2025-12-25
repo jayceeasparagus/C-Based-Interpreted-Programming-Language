@@ -1,10 +1,19 @@
-module add(input a, input b, output c) {
-    c = a + b;
+bool x = true;
+bool y = false;
+print(!x || (x && !y));
+
+module foo(input a, input b, output c) {
+    num temp = a | b;
+
+    c = temp + 2;
 }
-num x = 2;
-num y = 3;
-num z = 0;
-add(x, y, z);
-print(z);
-bool h = true;
-print(!h || true);
+
+num b = 5;
+num temp = 0;
+num max = 0;
+
+foo(2, b, max);
+while (temp < max) {
+    print(temp);
+    temp = temp + 1;
+}

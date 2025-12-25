@@ -13,7 +13,7 @@ TokenType peek_token(Parser *parser);
 
 ASTNode *parse_program(Parser *parser);
 
-ASTNode *parse_block(Parser *parser);
+ASTNode *parse_statements(Parser *parser);
 
 ASTNode *parse_if_else(Parser *parser);
 

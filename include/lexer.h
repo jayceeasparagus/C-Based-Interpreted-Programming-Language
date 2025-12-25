@@ -70,7 +70,6 @@ typedef struct {
 
 const char *token_type_name(TokenType type);
 
-
 void print_token(Token t);
 
 typedef struct {

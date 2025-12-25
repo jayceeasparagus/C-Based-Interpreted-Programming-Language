@@ -3,6 +3,8 @@
 #ifndef ENV_H
 #define ENV_H
 
+#define MAX_VARS 256
+
 typedef struct Env Env;
 
 typedef enum {
@@ -24,8 +26,8 @@ typedef struct {
 } ModuleEntry;
 
 struct Env {
-    char *names[128];
-    Value values[128];
+    char *names[MAX_VARS];
+    Value values[MAX_VARS];
     int count;
     Env *parent;
 };

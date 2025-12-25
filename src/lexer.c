@@ -111,7 +111,6 @@ Token make_token(TokenType type, const char *lexeme, double value, int line) {
 }
 
 void skip_whitespace(Lexer *lexer) {
-    // loop until no whitespace or eof
     while (lexer->src[lexer->pos] != '\0') {
         if (lexer->src[lexer->pos] == '\n') {
             lexer->pos++;
@@ -129,7 +128,6 @@ void skip_whitespace(Lexer *lexer) {
 Token make_token_number(Lexer *lexer) {
     int value = 0;
 
-    // binary
     if (lexer->src[lexer->pos] == '0' && lexer->src[lexer->pos + 1] == 'b') {
         lexer->pos += 2;
         
@@ -138,7 +136,6 @@ Token make_token_number(Lexer *lexer) {
             lexer->pos++;
         }
     }
-    // decimal
     else {
         while (isdigit(lexer->src[lexer->pos])) {
             value = value * 10 + (lexer->src[lexer->pos] - '0');
@@ -219,10 +216,8 @@ Token make_token_identifier_keyword(Lexer *lexer) {
 }
 
 Token next_token(Lexer *lexer) {
-    // skip whitespace
     skip_whitespace(lexer);
 
-    // check each possible token
     switch (lexer->src[lexer->pos]) {
         case '\0':
             return make_token(TOKEN_EOF, NULL, 0, lexer->line);

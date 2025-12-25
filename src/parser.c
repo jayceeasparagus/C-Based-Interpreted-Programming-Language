@@ -25,7 +25,7 @@ TokenType peek_token(Parser *parser) {
 
 static void expect(Parser *parser, TokenType type) {
     if (parser->current.type != type) {
-        printf("Error: Incorrect token type expected at: %d\n", parser->current.line);
+        printf("Error: Unexpected token at line %d, expected token of type %s", parser->current.line, token_type_name(type));
         exit(1);
     }
     advance(parser);
@@ -132,7 +132,7 @@ void parse_params(Parser *parser, char ***inputs, int *input_count, char ***outp
             (*outputs)[*output_count - 1] = name;
         }
         else {
-            printf("ERROR: Unknown parameter type\n");
+            printf("ERROR: Unknown parameter type at line %d\n", parser->current.line);
             exit(1);
         }
 
@@ -212,7 +212,7 @@ ASTNode *parse_statement(Parser *parser) {
         case TOKEN_MODULE:
             return parse_module(parser);
         default:
-            printf("ERROR: Incorrect statement token at: %d\n", parser->current.line);
+            printf("ERROR: Incorrect statement at line %d\n", parser->current.line);
             exit(1);
     }
 }
@@ -322,7 +322,6 @@ ASTNode *parse_unary(Parser *parser) {
 }
 
 ASTNode *parse_factor(Parser *parser) {
-    // high precedence
     if (parser->current.type == TOKEN_NUMBER) {
         double value = parser->current.value;
         advance(parser);
@@ -347,6 +346,6 @@ ASTNode *parse_factor(Parser *parser) {
         advance(parser);
         return ast_identifier(name);
     }
-    printf("ERROR: Incorrect factor token at: %d\n", parser->current.line);
+    printf("ERROR: Incorrect token at line %d\n", parser->current.line);
     exit(1);
 }

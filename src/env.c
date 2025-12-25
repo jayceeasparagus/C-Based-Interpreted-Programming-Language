@@ -32,7 +32,6 @@ Value env_get(const char *name) {
     exit(1);
 }
 
-
 void env_set(const char *name, Value value) {
     Env *env = current_env;
 
@@ -43,8 +42,8 @@ void env_set(const char *name, Value value) {
         }
     }
 
-    if (env->count >= 128) {
-        printf("ERROR: env full\n");
+    if (env->count >= MAX_VARS) {
+        printf("ERROR: Max Variables for scope\n");
         exit(1);
     }
 
@@ -62,9 +61,9 @@ Env *push_env() {
 }
 
 void pop_env() {
-    Env *old = current_env;
+    Env *old_env = current_env;
     current_env = current_env->parent;
-    free(old);
+    free(old_env);
 }
 
 Env *env_current() {

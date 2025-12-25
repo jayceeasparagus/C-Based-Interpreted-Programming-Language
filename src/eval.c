@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #define MAX_MODULES 128
+#define MAX_OUTPUTS 16
 
 static ModuleEntry modules[MAX_MODULES];
 static int module_count = 0;
@@ -13,7 +14,7 @@ ASTNode *find_module(const char *name) {
             return modules[i].module;
         }
     }
-    printf("ERROR: Unknown module '%s'", name);
+    printf("ERROR: Unknown module call '%s'", name);
     exit(1);
 }
 
@@ -58,7 +59,7 @@ Value eval(ASTNode *node) {
                     return value_boolean(left.boolean || right.boolean);
 
                 default:
-                    printf("ERROR: Unknown binary operator");
+                    printf("ERROR: Unknown binary operator\n");
                     exit(1);
             }
         }
@@ -173,23 +174,26 @@ Value eval(ASTNode *node) {
 
                 Env *module_env = push_env();
 
-                for (int i = 0; i < module->module.input_count; i++) {
+                for (int i = 0; i < module->module.input_count; ++i) {
                     Value v = eval(node->call.args[i]);
                     env_set(module->module.inputs[i], v);
                 }
 
                 eval(module->module.body);
 
-                Value outputs[16];
-                for (int i = 0; i < module->module.output_count; i++) {
+                Value outputs[MAX_OUTPUTS];
+                if (module->module.output_count > MAX_OUTPUTS) {
+                    printf("ERROR: Module has too many outputs, max amount of outputs is 16.  Module had %d outputs", module->module.output_count);
+                }
+                for (int i = 0; i < module->module.output_count; ++i) {
                     outputs[i] = env_get_from(module_env, module->module.outputs[i]);
                 }
 
                 pop_env();
                 
-                for (int i = 0; i < module->module.output_count; i++) {
-                    ASTNode *out_arg = node->call.args[module->module.input_count + i];
-                    env_set(out_arg->identifier, outputs[i]);
+                for (int i = 0; i < module->module.output_count; ++i) {
+                    ASTNode *output_arg = node->call.args[module->module.input_count + i];
+                    env_set(output_arg->identifier, outputs[i]);
                 }
 
                 return value_number(0);
