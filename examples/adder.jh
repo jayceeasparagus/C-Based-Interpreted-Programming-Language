@@ -1,4 +1,4 @@
-module add(input a, input b, output c) {\n"
+module add(input a, input b, output c) {
     c = a + b;
 }
 num x = 2;
