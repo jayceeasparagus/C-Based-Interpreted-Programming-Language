@@ -1,8 +1,45 @@
-C-Based Interpreted Programming Language
+# jh: C-Based Interpreted Programming Language
 
-This is a interpreted programming language I made in C.  This is a progamming language inspired by HDL languages, made to be easy to use.  An example program is provided.  My C program interprets it and outputs its result.
-The language features variables, printing, control flow, loops, and modules.
+**jh** is an **interpreted programming language** implemented in **C**.  
+The language is inspired by HDL-style modular design, with an emphasis on simplicity, clarity, and clean implementation.
 
-The program uses a lexer to make tokens, parser that uses ast for structure, eval to run the parsed program, and env for stack-based scoping variables.
+---
 
-To run the interpreter, get the executable and run: "./jh 'file_path'"
+## Language Features
+
+- Variables
+- Arithmetic and boolean logic
+- Bitwise operations and binary literals
+- Control flow statements
+- Loop constructs
+- Modules with defined inputs and outputs
+
+---
+
+## Architecture and Functionality
+
+- **Lexer**  
+  Converts source code into a stream of tokens representing keywords, identifiers, operators, and literals.
+
+- **Parser**  
+  Uses a recursive-descent approach to parse tokens and construct an **Abstract Syntax Tree (AST)** representing program structure.
+
+- **Abstract Syntax Tree (AST)**  
+  A tree-based representation of the program used during evaluation.
+
+- **Environment (Env)**  
+  A stack-based environment system that maps variable names to values and supports lexical scoping through parent environments.
+
+- **Evaluator (Eval)**  
+  Traverses and evaluates the AST to execute programs directly using a tree-walking interpreter.
+
+---
+
+## Running jh
+
+1. Build or obtain the `jh` executable.
+2. Place the executable in the project directory.
+3. Run a jh program using:
+
+```bash
+./jh <filepath>
